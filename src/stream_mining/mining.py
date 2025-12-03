@@ -22,7 +22,6 @@ def discover_heuristics(
             event_log,
             dependency_threshold=dependency_thresh,
         )
-
         try:
             bpmn_model = pm4py.convert_petri_net_to_bpmn(net, initial_marking, final_marking)
         except (AttributeError, TypeError):

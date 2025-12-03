@@ -11,18 +11,6 @@ from stream_mining.sliding_window import SlidingWindow
 
 
 def build_directly_follows(events_iter: Iterator[Event]) -> pd.DataFrame:
-    """Build directly-follows graph (DFG) from event iterator.
-
-    Constructs a directly-follows graph where edges represent consecutive
-    events within the same case. Cross-case edges are not created.
-
-    Args:
-        events_iter: Iterator over events (must be sorted by case_id and timestamp).
-
-    Returns:
-        DataFrame with columns: source, target, count
-        Each row represents a directly-follows relationship and its frequency.
-    """
     case_events: dict[str, list[Event]] = defaultdict(list)
 
     for event in events_iter:
@@ -56,9 +44,16 @@ def prepare_for_mining(
 ) -> EventLog:
     window_events: list[Event] = list(window.iter_events())
 
+    if not window_events:
+        return EventLog()
+
+    window_case_ids: set[str] = {event.case_id for event in window_events}
+
     decay_case_ids: set[str] = set()
     for event, _ in decay._events:
-        decay_case_ids.add(event.case_id)
+        case_id = event.case_id
+        if case_id not in window_case_ids:
+            decay_case_ids.add(case_id)
 
     decay_events: list[Event] = []
     for case_id in decay_case_ids:
@@ -67,9 +62,6 @@ def prepare_for_mining(
             decay_events.extend(case_events)
 
     all_events = window_events + decay_events
-
-    if not all_events:
-        return EventLog()
 
     case_events_dict: dict[str, list[Event]] = defaultdict(list)
     for event in all_events:
