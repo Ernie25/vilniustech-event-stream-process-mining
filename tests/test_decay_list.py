@@ -176,14 +176,20 @@ class TestDecayList:
         decay_list.update(event2)
         decay_list.update(event3)
 
-        # At time = base_time + 3 hours, event1 should have very low weight
+        # At time = base_time + 3 hours:
+        # event1 weight = 0.5 ** 3 = 0.125
+        # event2 weight = 0.5 ** 2.5 ≈ 0.177
+        # event3 weight = 0.5 ** 2 = 0.25
+        # Using eps=0.15, event1 should be removed (0.125 < 0.15), others kept
         sweep_time = base_time + timedelta(hours=3)
-        removed_count = decay_list.sweep(sweep_time, eps=0.1)
+        removed_count = decay_list.sweep(sweep_time, eps=0.15)
 
-        # event1 should be removed (weight ~0.125), event2 and event3 should remain
+        # event1 should be removed (weight ~0.125 < 0.15), event2 and event3 should remain
         assert removed_count >= 1
         remaining_events = [event for event, _ in decay_list._events]
         assert event1 not in remaining_events
+        assert event2 in remaining_events
+        assert event3 in remaining_events
 
     def test_sweep_with_different_eps(self):
         """Test sweep with different epsilon values."""
@@ -304,4 +310,6 @@ class TestDecayList:
         assert event1 in events
         assert event2 in events
         assert event3 in events
+
+
 
