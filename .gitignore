@@ -14,7 +14,7 @@ build/
 .coverage
 htmlcov/
 *.log
-results/
+data/
 data/*.xes
 !data/.gitkeep
 .ipynb_checkpoints/

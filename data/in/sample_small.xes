@@ -1,0 +1,65 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<log xes.version="1849-2016" xes.features="nested-attributes" openxes.version="1.0RC7" xmlns="http://www.xes-standard.org/">
+  <extension name="Concept" prefix="concept" uri="http://www.xes-standard.org/concept.xesext"/>
+  <extension name="Time" prefix="time" uri="http://www.xes-standard.org/time.xesext"/>
+  <extension name="Organizational" prefix="org" uri="http://www.xes-standard.org/org.xesext"/>
+  <global scope="trace">
+    <string key="concept:name" value="name"/>
+  </global>
+  <global scope="event">
+    <string key="concept:name" value="name"/>
+    <date key="time:timestamp" value="1970-01-01T00:00:00.000+00:00"/>
+  </global>
+  <trace>
+    <string key="concept:name" value="case1"/>
+    <event>
+      <string key="concept:name" value="start"/>
+      <date key="time:timestamp" value="2024-01-01T10:00:00.000+00:00"/>
+      <string key="org:resource" value="user1"/>
+    </event>
+    <event>
+      <string key="concept:name" value="process"/>
+      <date key="time:timestamp" value="2024-01-01T10:05:00.000+00:00"/>
+      <string key="org:resource" value="user1"/>
+    </event>
+    <event>
+      <string key="concept:name" value="end"/>
+      <date key="time:timestamp" value="2024-01-01T10:10:00.000+00:00"/>
+    </event>
+  </trace>
+  <trace>
+    <string key="concept:name" value="case2"/>
+    <event>
+      <string key="concept:name" value="start"/>
+      <date key="time:timestamp" value="2024-01-01T11:00:00.000+00:00"/>
+      <string key="org:resource" value="user2"/>
+    </event>
+    <event>
+      <string key="concept:name" value="end"/>
+      <date key="time:timestamp" value="2024-01-01T11:05:00.000+00:00"/>
+      <string key="org:resource" value="user2"/>
+    </event>
+  </trace>
+  <trace>
+    <string key="concept:name" value="case3"/>
+    <event>
+      <string key="concept:name" value="start"/>
+      <date key="time:timestamp" value="2024-01-01T12:00:00.000+00:00"/>
+    </event>
+    <event>
+      <string key="concept:name" value="process"/>
+      <date key="time:timestamp" value="2024-01-01T12:05:00.000+00:00"/>
+      <string key="org:resource" value="user3"/>
+    </event>
+    <event>
+      <string key="concept:name" value="review"/>
+      <date key="time:timestamp" value="2024-01-01T12:10:00.000+00:00"/>
+      <string key="org:resource" value="user3"/>
+    </event>
+    <event>
+      <string key="concept:name" value="end"/>
+      <date key="time:timestamp" value="2024-01-01T12:15:00.000+00:00"/>
+    </event>
+  </trace>
+</log>
+
