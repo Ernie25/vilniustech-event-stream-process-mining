@@ -9,24 +9,6 @@ def discover_heuristics(
     event_log: EventLog,
     dependency_thresh: float = 0.7,
 ) -> Optional[BPMN]:
-    """Discover BPMN process model using Inductive Miner algorithm.
-
-    Uses PM4Py's inductive miner to discover a BPMN model directly from an event log.
-    The algorithm identifies process patterns and constructs a BPMN model
-    representing the discovered process flow.
-
-    Args:
-        event_log: PM4Py EventLog containing traces and events.
-        dependency_thresh: Dependency threshold (kept for API compatibility, 
-                          but Inductive Miner uses its own parameters).
-
-    Returns:
-        BPMN model object if discovery succeeds.
-        Returns None if the event log is empty or contains insufficient data.
-
-    Raises:
-        ValueError: If event log is empty or contains no valid traces.
-    """
     if not event_log or len(event_log) == 0:
         raise ValueError("Cannot discover process model from empty event log")
 
@@ -36,12 +18,23 @@ def discover_heuristics(
         raise ValueError("Event log contains no events")
 
     try:
-        # Discover BPMN model using inductive miner
-        bpmn_model = pm4py.discover_bpmn_inductive(event_log)
+        net, initial_marking, final_marking = pm4py.discover_petri_net_heuristics(
+            event_log,
+            dependency_threshold=dependency_thresh,
+        )
+
+        try:
+            bpmn_model = pm4py.convert_petri_net_to_bpmn(net, initial_marking, final_marking)
+        except (AttributeError, TypeError):
+            try:
+                from pm4py.objects.conversion.bpmn import converter as bpmn_converter
+                bpmn_model = bpmn_converter.apply(net, initial_marking, final_marking)
+            except (ImportError, AttributeError):
+                process_tree = pm4py.convert_to_process_tree(net, initial_marking, final_marking)
+                bpmn_model = pm4py.convert_to_bpmn(process_tree)
 
         return bpmn_model
 
     except Exception as e:
-        # Handle cases where discovery fails (e.g., insufficient data)
-        raise ValueError(f"Failed to discover BPMN process model: {e}") from e
+        raise ValueError(f"Failed to discover BPMN process model using Heuristics Miner: {e}") from e
 
