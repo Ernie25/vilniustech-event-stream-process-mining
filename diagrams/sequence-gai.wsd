@@ -1,0 +1,24 @@
+@startuml
+actor "Process Analyst" as A
+participant "Web UI" as Web
+participant "GAI Co-pilot" as GAICoPilot
+participant "Process Mining API" as PMAPI
+participant "Process Discovery Engine" as Discovery
+participant "LLM API" as LLM
+
+A -> Web : Type NL question\n"Where do reimbursements get stuck?"
+Web -> GAICoPilot : sendQuestion(question, userId)
+
+GAICoPilot -> PMAPI : getContext(userId,\nlatestModel=true,\nmetrics=true)
+PMAPI -> Discovery : loadLatestModelAndMetrics()
+Discovery --> PMAPI : model, KPIs, logSlice
+
+PMAPI --> GAICoPilot : context (model + KPIs + logSlice)
+
+GAICoPilot -> LLM : prompt(question + context)
+LLM --> GAICoPilot : NL answer +\nstructuredRecommendations
+
+GAICoPilot -> Web : renderAnswer(answer,\nchartsConfig)
+Web --> A : show explanation,\nKPIs, highlighted BPMN
+
+@enduml

@@ -1,0 +1,29 @@
+@startuml
+left to right direction
+
+actor "Process Analyst" as Analyst
+actor "Finance Manager" as Manager
+actor "DevOps Engineer" as DevOps
+
+rectangle "TravelPay Streaming\nProcess Mining Platform" {
+  usecase "Monitor live\nreimbursement process" as UC_Monitor
+  usecase "Ask NL questions\nabout process" as UC_NLQ
+  usecase "Explain BPMN\nmodel in natural language" as UC_Explain
+  usecase "Recommend\nwindow & decay size" as UC_Tune
+  usecase "Summarize\nanomalies & SLA breaches" as UC_Alerts
+}
+
+Analyst --> UC_Monitor
+Analyst --> UC_NLQ
+Analyst --> UC_Explain
+Analyst --> UC_Tune
+
+Manager --> UC_Alerts
+Manager --> UC_Explain
+
+DevOps --> UC_Tune
+
+UC_NLQ ..> UC_Explain : <<includes>>
+UC_Tune ..> UC_Monitor : <<uses>>
+
+@enduml

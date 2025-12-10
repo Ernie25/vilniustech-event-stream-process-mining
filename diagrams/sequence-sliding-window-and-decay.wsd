@@ -1,0 +1,28 @@
+@startuml
+actor "DevOps Engineer" as DevOps
+participant "Web UI" as Web
+participant "GAI Co-pilot" as GAICoPilot
+participant "Process Mining API" as PMAPI
+participant "Config Store" as Config
+participant "LLM API" as LLM
+
+DevOps -> Web : "Suggest window & decay\nfor high-volume log"
+Web -> GAICoPilot : askTuningAdvice(request)
+
+GAICoPilot -> PMAPI : getCurrentConfig()
+PMAPI --> GAICoPilot : windowSize=10k,\ndecayFactor=0.1
+
+GAICoPilot -> PMAPI : getEvaluationHistory()
+PMAPI --> GAICoPilot : [fitness, precision,\nmemUsage, latency...]
+
+GAICoPilot -> LLM : prompt(tuningQuestion +\ncurrentConfig + history)
+LLM --> GAICoPilot : suggestedConfig\n(window=20k, decay=0.05)\n+ rationale
+
+GAICoPilot -> Web : showSuggestedConfig()
+Web --> DevOps : Display suggestion\n+ trade-offs
+
+DevOps -> Web : Accept new config
+Web -> PMAPI : updateConfig(newConfig)
+PMAPI -> Config : save(newConfig)
+
+@enduml
