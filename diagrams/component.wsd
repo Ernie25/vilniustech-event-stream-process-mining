@@ -1,0 +1,52 @@
+@startuml
+skinparam componentStyle rectangle
+
+package "TravelPay Core Systems" {
+  [Expense Portal] as ExpensePortal
+  [Travel Booking Service] as BookingService
+  [Payment Service] as PaymentService
+}
+
+package "Event Infrastructure" {
+  [Event Store / Kafka] as EventStore
+  [Relational DB] as DB
+}
+
+package "Streaming Process Mining Platform" {
+  [Event Ingestion API\n(Django)] as Ingestion
+  [Sliding Window Manager] as Window
+  [Decay List Manager] as Decay
+  [Process Discovery Engine\n(PM4Py Heuristics Miner)] as Discovery
+  [Conformance Checker] as Conformance
+  [BPMN / Petri Exporter] as Exporter
+  [Process Mining API] as PMAPI
+  [Web UI\n(Process Cockpit)] as WebUI
+  [GAI Co-pilot Service] as GAICoPilot
+}
+
+package "GAI Provider" {
+  [LLM API\n(OpenAI / Azure)] as LLM
+}
+
+ExpensePortal --> EventStore : emit domain events
+BookingService --> EventStore
+PaymentService --> EventStore
+
+EventStore --> Ingestion : subscribe events
+Ingestion --> Window : append event
+Window --> Decay : evict traces\ninto decay list
+Window --> Discovery : current window\nof traces
+Discovery --> Conformance
+Conformance --> PMAPI : models, metrics
+Discovery --> Exporter : BPMN / Petri / C-nets
+Exporter --> PMAPI
+PMAPI --> DB : store models,\nmetrics, configs
+
+WebUI --> PMAPI : dashboards,\nmodels, logs
+WebUI --> GAICoPilot : NL questions,\n"explain this model"
+
+GAICoPilot --> PMAPI : fetch models,\nKPIs, log slices
+GAICoPilot --> LLM : prompt with\ncontext + question
+LLM --> GAICoPilot : answer + suggestions
+
+@enduml
